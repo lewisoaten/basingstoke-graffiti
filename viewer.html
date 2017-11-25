@@ -1,0 +1,22 @@
+<!-- AR.js by @jerome_etienne - github: https://github.com/jeromeetienne/ar.js - info: https://medium.com/arjs/augmented-reality-in-10-lines-of-html-4e193ea9fdbf -->
+<!doctype HTML>
+<html>
+  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.1/aframe/examples/vendor/aframe/build/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.5.1/aframe/build/aframe-ar.js"></script>
+  <script src="https://rawgit.com/mayognaise/aframe-mouse-cursor-component/master/dist/aframe-mouse-cursor-component.min.js"></script>
+  <body style='margin : 0px; overflow: hidden;'>
+  	<a-scene embedded arjs='trackingMethod: best; markersAreaEnabled: true;'>
+      <a-marker-camera preset="hiro" mouse-cursor>
+        <a-plane
+          onclick="location.href='/getimage/1'"
+          position="0 0 0"
+          rotation="-90 0 0"
+          width="5"
+          height="5"
+          material='opacity:0.5;'
+          src='/getimage/1'>
+        </a-plane>
+      </a-marker-camera>
+  	</a-scene>
+  </body>
+</html>
