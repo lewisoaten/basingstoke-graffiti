@@ -96,7 +96,7 @@ input[type=radio] {
 	display: none;
 	width: 0;
 }
-input[type=radio]:checked + label::after {
+input[type=radio]:checked:not(#color07):not(#clear) + label::after {
 	content: '\2712';
 	position: absolute;
 	left: 8px;

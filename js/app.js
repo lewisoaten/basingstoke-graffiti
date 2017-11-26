@@ -1,10 +1,16 @@
 (function() {
 	/* Canvas */
 
+	var plane = document.getElementById('plane');
 	var canvas = document.getElementById('drawCanvas');
 	var ctx = canvas.getContext('2d');
 	var color = document.querySelector(':checked').getAttribute('data-color');
 	var archiveButton = document.getElementById('clear');
+	var previousButton = document.getElementById('previous');
+	var liveButton = document.getElementById('live');
+
+	var keepUpdated = true;
+	var imageId = 0;
 
 	canvas.width = Math.min(document.documentElement.clientWidth, window.innerWidth || 300);
 	canvas.height = Math.min(document.documentElement.clientHeight, window.innerHeight || 300);
@@ -31,8 +37,32 @@
 	canvas.addEventListener(moveEvent, draw, false);
 	canvas.addEventListener(upEvent, endDraw, false);
 
+	function imageUpload(){
+	  var dataURL = canvas.toDataURL('image/png')
+	  var blob = dataURItoBlob(dataURL)
+	  var formData = new FormData()
+		formData.append('location', 1)
+	  formData.append('myFile', blob)
+
+	  var xhr = new XMLHttpRequest();
+	  xhr.open( 'POST', '/archiveimage', true )
+	  xhr.onload = xhr.onerror = function() {
+	    console.log( xhr.responseText )
+	  };
+	  xhr.send( formData )
+	}
+
+	function dataURItoBlob(dataURI) {
+	  var byteString = atob(dataURI.split(',')[1]);
+	  var ab = new ArrayBuffer(byteString.length);
+	  var ia = new Uint8Array(ab);
+	  for (var i = 0; i < byteString.length; i++) { ia[i] = byteString.charCodeAt(i); }
+	  return new Blob([ab], { type: 'image/jpeg' });
+	}
+
 	function archive() {
 
+		imageUpload()
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		var plts = []
@@ -47,6 +77,61 @@
 	}
 
 	archiveButton.addEventListener("click", archive, false);
+
+	function updateFromHistory() {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		pubnub.history({
+			channel  : channel,
+			count    : 50,
+			callback : function(messages) {
+				pubnub.each( messages[0], drawFromStream );
+			}
+		});
+	}
+
+	function backToLive() {
+		imageId = 0;
+		keepUpdated = true;
+		updateFromHistory();
+	}
+
+	if(liveButton) {
+		liveButton.addEventListener("click", backToLive, false);
+	}
+
+	function setImage(id) {
+		base_image = new Image();
+		base_image.src = '/getarchiveimage?location=1&version='+id.toString();
+
+		base_image.onload = function(){
+			keepUpdated = false;
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.drawImage(base_image, 0, 0, base_image.width, base_image.height);
+		}
+	}
+
+	function previous() {
+		if(imageId<1) {
+	    var xmlHttp = new XMLHttpRequest();
+	    xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+					imageId = xmlHttp.responseText;
+          setImage(imageId);
+				}
+	    }
+	    xmlHttp.open("GET", "/countimages/1", true); // true for asynchronous
+	    xmlHttp.send(null);
+		} else if(imageId==1) {
+			backToLive()
+		} else {
+			imageId--;
+			setImage(imageId)
+		}
+	}
+
+	if(previousButton) {
+		previousButton.addEventListener("click", previous, false);
+	}
 
 	/* PubNub */
 
@@ -81,35 +166,29 @@
 			channel: channel,
 			message: data
 		});
-     }
+   }
 
-    /* Draw on canvas */
+  /* Draw on canvas */
 
-    function drawOnCanvas(color, plots) {
-    	ctx.strokeStyle = color;
-			ctx.beginPath();
-			ctx.moveTo(plots[0].x, plots[0].y);
+  function drawOnCanvas(color, plots) {
+  	ctx.strokeStyle = color;
+		ctx.beginPath();
+		ctx.moveTo(plots[0].x, plots[0].y);
 
-    	for(var i=1; i<plots.length; i++) {
-	    	ctx.lineTo(plots[i].x, plots[i].y);
-	    }
-	    ctx.stroke();
+  	for(var i=1; i<plots.length; i++) {
+    	ctx.lineTo(plots[i].x, plots[i].y);
     }
+    ctx.stroke();
+  }
 
-    function drawFromStream(message) {
-		if(!message || message.plots.length < 1) return;
-		drawOnCanvas(message.color, message.plots);
-    }
+  function drawFromStream(message) {
+	if(!keepUpdated || !message || message.plots.length < 1) return;
+	drawOnCanvas(message.color, message.plots);
+  }
 
-    // Get Older and Past Drawings!
-    if(drawHistory) {
-	    pubnub.history({
-	    	channel  : channel,
-	    	count    : 50,
-	    	callback : function(messages) {
-	    		pubnub.each( messages[0], drawFromStream );
-	    	}
-	    });
+  // Get Older and Past Drawings!
+  if(drawHistory) {
+    updateFromHistory();
 	}
     var isActive = false;
     var plots = [];
