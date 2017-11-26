@@ -2,10 +2,7 @@
 <!doctype HTML>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>Basingstoke Graffiti</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="js/aframe.js"></script>
     <script src="js/aframe-ar.js"></script>
@@ -13,24 +10,59 @@
   </head>
   <body style='margin : 0px; overflow: hidden;'>
   	<a-scene embedded arjs='detectionMode: mono_and_matrix; matrixCodeType: 3x3;'>
-      <!-- <a-marker-camera preset="hiro" mouse-cursor> -->
       <a-marker type='barcode' value='1'>
         <a-plane
           id="plane"
           onclick="location.href='/static/history2.html'"
           position="0 0 0"
           rotation="-90 0 0"
-          width="3"
-          height="3"
+          width="6"
+          height="6"
           material="opacity: 0.8; src: #drawCanvas"
           draw-canvas="drawCanvas">
         </a-plane>
       </a-marker>
 
-      <a-entity camera></a-entity>
+      <a-marker type='barcode' value='2'>
+        <a-plane
+          id="plane"
+          position="0 0 0"
+          rotation="-90 0 0"
+          width="6"
+          height="6"
+          material="opacity: 0.8;"
+          src="/getimage/2">
+        </a-plane>
+      </a-marker>
+
+      <a-marker type='barcode' value='3'>
+        <a-plane
+          id="plane"
+          position="0 0 0"
+          rotation="-90 0 0"
+          width="6"
+          height="6"
+          material="opacity: 0.8;"
+          src="/getimage/3">
+        </a-plane>
+      </a-marker>
+
+      <a-marker type='barcode' value='4'>
+        <a-plane
+          id="plane"
+          position="0 0 0"
+          rotation="-90 0 0"
+          width="6"
+          height="6"
+          material="opacity: 0.8;"
+          src="/getimage/4">
+        </a-plane>
+      </a-marker>
+
+      <a-entity camera mouse-cursor></a-entity>
 
       <a-assets>
-        <canvas id="drawCanvas" crossorigin="anonymous"></canvas>
+        <canvas id="drawCanvas" width=600 height=600 crossorigin="anonymous"></canvas>
       </a-assets>
   	</a-scene>
 
@@ -40,15 +72,15 @@
         <span id="unit">graffiti artists</span>
       </div>
       <div style="color: rgba(0, 0, 0, 0.9); background-color: rgba(127, 127, 127, 0.5); display: inline-block; padding: 0.5em; margin: 0.5em; text-align: left;">
-        <input id="previous" type="button" value="<" style="height: 20px"></input>
-        <input id="clear" type="button" value="Archive Graffiti" style="height: 20px"></input>
-        <input id="live" type="button" value="Live View" style="height: 20px"></input>
+        <button id="previous" type="button" value="<" style="height: 40px; min-width: 40px"><</button>
+        <button id="edit" type="button" value="Make your mark!" style="height: 40px" onclick="location.href='/static/history2.html'">Make your mark!</button>
+        <button id="live" type="button" value="Live View" style="height: 40px">Live View</button>
       </div>
       <section id="colorSwatch" style="display: none">
         <input type="radio" name="color" id="color01" data-color="gold" checked><label for="color01"></label>
       </section>
     </div>
-    <div id="arjsDebugUIContainer" style="display: none;">
+    <div id="arjsDebugUIContainer" style="display: none;" />
 
     <script>
       var drawHistory = true;

@@ -12,11 +12,11 @@
 	var keepUpdated = true;
 	var imageId = 0;
 
-	canvas.width = Math.min(document.documentElement.clientWidth, window.innerWidth || 300);
-	canvas.height = Math.min(document.documentElement.clientHeight, window.innerHeight || 300);
+	canvas.width = Math.min(document.documentElement.clientWidth, window.innerWidth || 600);
+	canvas.height = Math.min(document.documentElement.clientHeight, window.innerHeight || 600);
 
 	ctx.strokeStyle = color;
-	ctx.lineWidth = '8';
+	ctx.lineWidth = '10';
 	ctx.lineCap = ctx.lineJoin = 'round';
 
 	/* Mouse and touch events */
@@ -76,7 +76,9 @@
 		}
 	}
 
-	archiveButton.addEventListener("click", archive, false);
+	if(archiveButton) {
+		archiveButton.addEventListener("click", archive, false);
+	}
 
 	function updateFromHistory() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
