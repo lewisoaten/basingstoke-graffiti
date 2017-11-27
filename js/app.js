@@ -68,7 +68,7 @@
 		var plts = []
 		plts[0] = {x: 0, y: 0}
 
-		for(var i=1; i<50; i++) {
+		for(var i=1; i<100; i++) {
 			publish({
 				color: "gold",
 				plots: plts
@@ -84,7 +84,7 @@
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		pubnub.history({
 			channel  : channel,
-			count    : 50,
+			count    : 100,
 			callback : function(messages) {
 				pubnub.each( messages[0], drawFromStream );
 			}
